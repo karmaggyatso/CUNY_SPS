@@ -1,0 +1,91 @@
+---
+title: "data607_Assignment1"
+author: "karmaGyatso"
+date: '2022-09-03'
+output:
+  html_document:
+    df_print: paged
+---
+```{r}
+library(dplyr)
+library(ggplot2)
+library(scales)
+```
+The analysis is on whether the voter would want Republicans or Democrats in Congress. The dataset is taken from fiveThirtyEight and link to the page is https://projects.fivethirtyeight.com/polls/generic-ballot/
+
+As per my understanding there are various pollster organization who take survey on random sample of voters and register their answer if they want Replublican or Democrats in Congress. 
+
+## Getting started
+
+Firstly, I have uploaded the data in the github and fetched the data in raw format and push the dataset in the dataframe. The dimension of the data is 497 X 39
+```{r}
+data <- read.csv('https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/generic_ballot_polls.csv', header = FALSE, sep = ',')
+polls <- data.frame(data) 
+
+polls
+```
+```{r}
+dim(polls)
+```
+
+## Subset
+
+Created a subset of a dataframe and selected only the required columns from the original dataset. 
+```{r}
+result <- subset(polls, select=c('V3', 'V5',  'V18', 'V11', 'V12', 'V34', 'V37', 'V38'))
+result<-result[-1,]
+result
+```
+
+## Renaming the columns names
+
+Renamed the column name
+```{r}
+colnames(result) <- c('Pollster', 'Sponsers', 'Sample Size', 'State','Start_date', 'Election Date', 'Dem', 'Rep')
+result
+```
+## Adding a column and data in the column
+I used the mutate function to update the subset dataframe and added a additional column where it shows the differences in percentile from each organization. I used the case_when function to display appropriately. as.numeric function had to used because the value were type character. 
+```{r}
+result <- result %>%
+  mutate(LeaderBoard = case_when(
+    as.numeric(Dem)> as.numeric(Rep) ~ paste("Dem +", as.numeric(Dem) - as.numeric(Rep), sep = ""),
+    as.numeric(Rep) > as.numeric(Dem) ~ paste("Rep +", as.numeric(Rep) - as.numeric(Dem), sep = "")
+    ))
+result
+```
+
+## Graph
+A graphical representation of showing people voting for their favorite party with the timeline. 
+```{r}
+result$Dem<-as.numeric(result$Dem)/100
+result$Rep<-as.numeric(result$Rep)/100
+percent(as.numeric(result$Dem))
+
+percent(as.numeric(result$Rep))
+
+
+ggplot(result, aes(x=`Start_date`))+
+  geom_point(aes(y=as.numeric(Dem)), color='blue')+
+  geom_point(aes(y=as.numeric(Rep)), color='red')+
+  scale_y_continuous(labels = percent, limits = c(0,1))+
+  scale_x_discrete(guide = guide_axis(check.overlap = TRUE)
+                  )
+
+```
+
+
+```{r}
+class(result$Dem)
+```
+
+```{r}
+round(mean(as.numeric(result$Dem)))
+```
+```{r}
+round(mean(as.numeric(result$Rep)))
+```
+
+## Conclusion
+
+According to the poll, the mean of the Democrats is 43% amd Replublican is 42%. The difference is 1% and it shows that maximum number of people wants Democrats in the Congress. 
