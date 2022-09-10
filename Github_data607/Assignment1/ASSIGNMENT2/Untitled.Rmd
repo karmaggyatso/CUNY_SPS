@@ -1,0 +1,91 @@
+---
+title: "Data607_assignment2"
+author: "karmaGyatso"
+date: '2022-09-09'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+```{r}
+library(RMySQL)
+library(dplyr)
+```
+## Introduction
+
+I gathered a list of six recent movie names and asked 5 friends and neigbor if they have watched any of them and rate it. 
+
+In the MYSQL database, I created 4 tables which are GENRE, MOVIES, PERSON AND REVIEWS. 
+
+In the code below, I have established a connection to MySQL database and it requires to enter a password because I didn't wanted to reveal it. 
+
+```{r}
+mysqlconnection = dbConnect(RMySQL::MySQL(),
+                            dbname='movies',
+                            host='127.0.0.1',
+                            port=3306,
+                            user='root',
+                            password=rstudioapi::askForPassword("database password"))
+
+```
+
+## MOVIES TABLE
+In the MOVIES table, there are list of 6 movie titles with their genre. The FOREIGN KEY is GENRE_ID in the MOVIES table.
+
+## GENRE TABLE
+Genre consist of 7 types and ID column in it, which is FOREIGN KEY  in MOVIES table
+
+## PERSON TABLE
+Person table consist of name of people who volunteered to rate the movies. ID is FOREIGN KEY in Reviews table.
+
+## REVIEWS TABLE
+In the table, we have column id, name_id FOREIGN KEY REFERENCES PERSON(ID), movie_id FOREIGN KEY REFERENCES MOVIES(ID), and review
+```{r}
+dbListTables(mysqlconnection) 
+```
+
+## Getting data from the Database
+I used join condition to join all the tables and get one complete data set and fetch it and store in the data.frame
+```{r}
+result <- dbSendQuery(mysqlconnection, "SELECT M.MOVIE_TITLE AS MOVIE_TITLE, A.GENRE_TITLE AS GENRE, C.NAME AS NAME, B.REVIEW AS RATING FROM MOVIES M
+JOIN GENRE A ON A.ID = M.GENRE_ID
+JOIN REVIEWS B ON B.MOVIE_ID = M.ID 
+JOIN PERSON C ON C.ID = B.NAME_ID;")
+```
+
+
+```{r}
+data<-fetch(result)
+print(data)
+```
+
+## Most loved
+Among the six movies, most of them loved PINOCCHIO, which falls under drama GENRE. The rating is 3.75. The dataset is arranged in DESC order. 
+```{r}
+data %>%
+    filter(!is.na(RATING) ) %>%
+      group_by(MOVIE_TITLE) %>% 
+        summarise(avg_rating = mean(RATING)) %>%
+          arrange(desc(avg_rating))
+```
+## Most Watched
+Even though PINOCCHIO is most loved, it competes with THOR: LOVE AND THUNDER in most watched catagory. 
+```{r}
+data %>%
+    filter(!is.na(RATING) ) %>%
+      group_by(MOVIE_TITLE) %>% 
+        count(MOVIE_TITLE, sort=TRUE)
+```
+## Most watched GENRE
+The most watched GENRE is action. Followed by Adventure. 
+```{r}
+most_watched_genre <- data %>%
+    filter(!is.na(RATING) ) %>%
+      group_by(GENRE) %>% 
+        count(GENRE, sort=TRUE)
+most_watched_genre
+```
+
+
+
