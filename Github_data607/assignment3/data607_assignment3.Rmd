@@ -1,0 +1,122 @@
+---
+title: "data607_assignment3"
+author: "karmaGyatso"
+date: '2022-09-17'
+output: html_document
+---
+```{r}
+library(tidyverse)
+```
+
+## #1. Using the 173 majors listed in fivethirtyeight.com’s College Majors dataset [https://fivethirtyeight.com/features/the-economic-guide-to-picking-a-college-major/], provide code that identifies the majors that contain either "DATA" or "STATISTICS"
+```{r}
+csv_data <- read.csv('https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/grad-students.csv')
+
+glimpse(csv_data)
+```
+```{r}
+string_match <- csv_data %>% 
+  filter(str_detect(Major, "DATA|STATISTIC")) %>%
+  head()
+  
+string_match
+```
+
+## #2 Write code that transforms the data below:
+[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+[9] "elderberry"   "lime"         "lychee"       "mulberry" 
+[13] "olive"        "salal berry"
+
+**Into a format like this:**
+
+c("bell pepper", "bilberry", "blackberry", "blood orange", "blueberry", "cantaloupe", "chili pepper", "cloudberry", "elderberry", "lime", "lychee", "mulberry", "olive", "salal berry")
+
+```{r}
+str_fruits <- '[1] "bell pepper"  "bilberry"     "blackberry"   "blood orange"
+
+[5] "blueberry"    "cantaloupe"   "chili pepper" "cloudberry"  
+
+[9] "elderberry"   "lime"         "lychee"       "mulberry"    
+
+[13] "olive"        "salal berry"'
+str_fruits_pattern <- str_extract_all(str_fruits,pattern = '[A-Za-z]+.?[A-Za-z]+')
+str_fruits_pattern <- unlist(str_fruits_pattern)
+
+str_fruits_pattern 
+```
+
+```{r}
+newformat <- str_c(str_fruits_pattern, sep = ",", collapse = "\", \"")
+newformat <-  paste("c(\"", newformat,"\")")
+newformat <- str_replace(newformat, " b", "b")
+newformat <- str_replace(newformat, "y ", "y")
+cat(newformat)
+```
+
+## #3 Describe, in words, what these expressions will match:
+
+```{r}
+test_string <- c('aaa', 'bbb', 'cat', 'doll', 'aba', 'cda', 'kind', 'noon', 'moon','byby', 'axaxa','racecar')
+```
+
+### (.)\1\1
+**It will display any character that is repeated 3 times  **
+
+```{r}
+str_match(test_string, '(.)\\1\\1')
+```
+
+
+
+### (.)(.)\\2\\1
+
+**same letter before and after of 2 same character**
+```{r}
+str_match(test_string, '(.)(.)\\2\\1')
+```
+
+### (..)\1
+**Regular expression not represented in string format that has two characters repeated twice in the same order**
+```{r}
+str_match(test_string, '(..)\\1')
+```
+
+### "(.).\\1.\\1"
+**The letter is located that has any letter after it. Then the letter with any letter with the repeated letter**
+```{r}
+str_match(test_string, '(.).\\1.\\1')
+```
+
+### "(.)(.)(.).*\\3\\2\\1"
+**letters follows by same three letters but the third swap the position with the first letter**
+```{r}
+str_match(test_string, '(.)(.)(.).*\\3\\2\\1')
+
+```
+
+## #4 Construct regular expressions to match words that:
+
+```{r}
+pr4_str <- c('wow', 'ada', 'peep', 'mama', 'kaka', 'eleven', 'rarer')
+```
+
+### Start and end with the same character. 
+
+```{r}
+str_match(pr4_str, "^(.).*\\1$")
+```
+
+### Contain a repeated pair of letters (e.g. “church” contains “ch” repeated twice.) 
+
+```{r}
+str_match(pr4_str, "(..).*\\1")
+```
+
+### Contain one letter repeated in at least three places (e.g. “eleven” contains three “e”s.) 
+
+```{r}
+str_match(pr4_str, "(.).*\\1.*\\1")
+
+```
+
