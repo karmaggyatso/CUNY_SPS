@@ -1,0 +1,45 @@
+---
+title: "Assignment_4"
+author: "karmaGyatso"
+date: '2022-10-05'
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(stringr)
+```
+
+Created a csv file and uploaded in the github. The structure of the csv is little unconvetional and hard to grab any data. I have replaced all the empty spaces with **NA** so that it is easier to work later. 
+```{r}
+untidy_flight_data <- read.csv('https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/assignment_4/untidy_flight_dataset.csv', na.strings = c('', 'NA'))
+
+untidy_flight_data
+```
+
+In this section we are filling the X column with Value of Either Alaska or AM West and dropping all the NA values. 
+**tidyr::pivot_longer** is used to change the structure of the dataset and create a new variable name **Arrival** so that the dataset is arranged according to the airport destination.
+**tidyr::pivot_wider** is used to add column **on.Time** and  **delayed** and grap the data from temp column *Time*
+```{r}
+tidy_data <- untidy_flight_data %>%
+  fill('X') %>%
+  drop_na() %>%
+  pivot_longer(cols = c('Los.Angeles', 'Phoenix', 'San.Diego', 'San.Francisco', 'Seattle'), names_to = 'Arrival', values_to = 'Time' ) %>%
+  pivot_wider(names_from = 'X.1', values_from = 'Time')
+tidy_data
+```
+In the section, the column name of X is changed to Departure and renamed the column name **on time** to **on.time** for consistency. 
+```{r}
+colnames(tidy_data)[names(tidy_data) == 'X'] <- "Departure"
+names(tidy_data) <- str_replace_all(names(tidy_data), c(" " = "."))
+tidy_data
+```
+
+The analysis I performed was to determine the average **on time** and **delay** . 
+```{r}
+tidy_data %>%
+  filter(Arrival == 'Los.Angeles') %>%
+  summarise(on_time_mean = mean(on.time), delay_mean = mean(delayed))
+```
+
