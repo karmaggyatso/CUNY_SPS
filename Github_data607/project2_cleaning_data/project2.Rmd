@@ -1,0 +1,114 @@
+---
+title: "data607_project2"
+author: "karmaGyatso"
+date: '2022-10-09'
+output: html_document
+---
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+```
+
+The data is taken from [Pro Football Reference][nfl_link] and it is in wide format. Even though the dataset has win-loss column but it doesnt clarifies what it means. So I'm cleaning the column with correct values and changing the column names for clarification. 
+
+```{r}
+uncleaned_nfl <- read.csv("https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/project2_cleaning_data/unclean_nfl.csv")
+uncleaned_nfl
+```
+
+In this section I am renaming all the variable name so that it is easier to understand the columns
+
+```{r}
+colnames(uncleaned_nfl) <- c('teams', 'win', 'loss', 'tie', 'win-loss', 'teamScore', 'opponentScore', 'scoreDiff', 'marginVictory', 'strengthScheduel', 'simpleRatingSys', 'offensiveSRS', 'defensiveSRS')
+```
+
+I have added few more columns like total_game and win_percent with correct representation. 
+**Select(-c(`win-loss`))** dropping the column win-loss from the original dataset
+**select(teams, win, loss, tie, total_game, win_percent, everything())**: over here I'm rearranging the column order
+```{r}
+clean_nfl <- uncleaned_nfl %>%
+  mutate(total_game = win + loss) %>%
+  mutate(win_percent = (win/total_game)*100) %>%
+  select(-c(`win-loss`)) %>%
+  select(teams, win, loss, tie, total_game, win_percent, everything())
+
+clean_nfl
+```
+## Analysis
+
+I used geom_col to graph the data and the visualization represents the maximum and minumum win% of a team. 
+```{r}
+ggplot(clean_nfl, aes(x= teams, y = win_percent)) + 
+  geom_col(position = 'dodge') + 
+  #scale_y_continuous(labels = percent) + 
+  coord_flip()
+  
+
+```
+### Student Records
+
+A dataset of students with their score in each term. The dataframe is in wider format and there are empty rows which needs to be deleted. 
+
+```{r}
+uncleaned_student_records <- read.csv('https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/project2_cleaning_data/unclean_student_records.csv')
+
+```
+in this section, column sex_age is splitted into two column, which are **sex and age**, with their respective values. Also, gathering the term.1, term.2 and term.3 column into single column called term and its values are stored in column **score**
+```{r}
+student_exam_df <- uncleaned_student_records |>
+  drop_na() |> 
+  separate(sex.and.age, into = c('sex', 'age'), sep = '_') |> 
+  pivot_longer(cols = c('term.1', 'term.2', 'term.3'), names_to = 'term', values_to = 'score')
+
+```
+
+In this section, I am extracting all on the numbers of the columns and avoiding the characters. 
+```{r}
+student_exam_df$term <- str_extract(student_exam_df$term, '\\d')
+student_exam_df$test.number <- str_extract(student_exam_df$test.number, '\\d')
+
+student_exam_df
+
+```
+in this section, I have averaged the score of student's name and term. I have used .groups = 'drops' because in my version of R, 4.2.1, it looks like multiple grouping is not supported. 
+```{r}
+avg_df <- student_exam_df |> 
+  group_by(name, term) |>
+  summarise(avg = mean(score), .groups = 'drop')
+
+head(avg_df)
+```
+### Admission Records based on gender
+
+```{r}
+uncleaned_admission_df <- read.csv('https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/project2_cleaning_data/unclean_admission.csv')
+
+uncleaned_admission_df
+```
+
+```{r}
+admin_gender_df <- uncleaned_admission_df |> 
+  pivot_longer(cols = c('Admitted', 'Rejected'), names_to = 'status', values_to = 'total')
+
+admin_gender_df
+```
+```{r}
+admin_gender_df |> 
+  group_by(Gender) |>
+  summarise(total_application = sum(total))
+```
+
+```{r}
+ggplot(admin_gender_df, aes(x=status, y = total, fill=Gender)) + 
+  geom_col(position = 'dodge')+ 
+  coord_flip()
+```
+
+
+[nfl_link]: https://www.pro-football-reference.com/years/2022/#AFC
+
+
+
