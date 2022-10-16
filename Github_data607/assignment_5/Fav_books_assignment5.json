@@ -1,0 +1,22 @@
+{
+  "books": [
+    {
+      "title": "Providence",
+      "author": "Max Berry",
+      "Year of Publish": "2020",
+      "publisher": "G. P. Putnam’s Sons"
+    },
+    {
+      "title": "The Art of Star Wars: Galaxy’s Edge",
+      "author": "Amy Ratcliffe",
+      "Year of Publish": "2021",
+      "publisher": "Orbit"
+    },
+    {
+      "title": "Data Science for Business",
+      "author": ["Foster Provost", "Tom Fawcett"],
+      "Year of Publish": "2013",
+      "publisher": "O'Reily Media Inc"
+    }
+  ]
+}
