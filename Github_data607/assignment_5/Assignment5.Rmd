@@ -1,0 +1,54 @@
+---
+title: "data607_assignment5"
+author: "karmaGyatso"
+date: '2022-10-16'
+output: html_document
+---
+
+In this assignment, we have to read the tables from three different files and they are XML, HTML, and JSON. The files are uploaded in the github and the url is used to fetch the data. 
+
+
+```{r}
+
+library(rvest)
+
+from_html <- read_html("https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/assignment_5/Fav_books_assignment5.html")
+
+# bookTable df is created and all the data are stored here from_html. fill attributes has been used here to automatically fill rows with fewer than the maximum number of columns with `NA`s.
+bookTable <- from_html |> 
+  html_table(fill = TRUE)
+
+bookTable
+```
+
+```{r}
+library(XML)
+library(xml2)
+library(plyr)
+
+from_xml <- read_xml("https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/assignment_5/Fav_books_assignment5.xml")
+
+# parsing the data of the raw file received from the URL
+xml_format <- xmlParse(file = from_xml)
+
+#converting the parsed file to data.frame using ldply funtion and attributes xmlToList is used to convert. 
+xml_df <- ldply(xmlToList(xml_format), data.frame)
+xml_df
+```
+
+```{r}
+library(jsonlite)
+
+#fromJson is a library from jsonlite that converts the JSON objects into R objects. 
+from_json <- fromJSON("https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/Github_data607/assignment_5/Fav_books_assignment5.json")
+
+from_json
+
+```
+
+## Conclusion: 
+Every file was imported differently. The datasets are not identical as the structer of the file extension are different as well. 
+In the XML, I used two author tags to specify that the book contains two authors and in the R, there is an additional column called author.1. Similarly, in the JSON file the authors were in a list and in R it is catagorised in list as well without displaying the result. 
+
+
+
