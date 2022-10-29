@@ -1,0 +1,52 @@
+---
+title: "data607_assignment7"
+author: "karmaGyatso"
+date: '2022-10-29'
+output: html_document
+---
+
+```{r}
+library(httr)
+library(jsonlite)
+library(DT)
+```
+
+In this assignment, we are require to use the **New York Times** API and read the JSON data and transform in R dataframe. I have used NYT books API and generated the API KEY upon signing in the website. 
+
+The process to use the API is provided [here] (https://developer.nytimes.com/docs/books-product/1/overview)
+
+Below code shows the format to call the API. The URL is concatinated with api-key. 
+```{r}
+url <- 'https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json'
+api_key <- 'TBbi8eCy7Amyr926FiHGJZlEXYcgVUWr'
+
+main_url <- paste(url,'?api-key=',api_key, sep = '')
+
+```
+
+Reading the JSON content from the URL. Flatten function remove the level of hierrachy from a list. The new variable class type is LIST. We need to convert to **data.frame**
+```{r}
+books_raw_list <- fromJSON(main_url, flatten = TRUE)
+class(books_raw_list)
+```
+
+
+
+Creating the data frame from the JSON format list.
+```{r}
+books_df <- data.frame(books_raw_list$results$books)
+
+class(books_df)
+```
+
+Selecting only couple of column header. 
+```{r}
+books_df_subset <- books_df[, c("rank", "title", "author", "price", "publisher", "primary_isbn13")]
+
+books_df_subset
+```
+DT::datatable allows us to search and limit display result. 
+```{r}
+DT::datatable(books_df_subset)
+```
+
