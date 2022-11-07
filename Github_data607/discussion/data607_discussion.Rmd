@@ -1,0 +1,40 @@
+---
+title: "data607_discussion"
+author: "karmaGyatso"
+date: '2022-11-07'
+output: html_document
+---
+
+Your task is to analyze an existing recommender system that you find interesting.
+
+You should:
+
+    1. Perform a Scenario Design analysis as described below. Consider whether it makes sense for your selected recommender system to perform scenario design twice, once for the organization (e.g. Amazon.com) and once for the organization’s customers.
+
+    2. Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere.
+
+    3. Include specific recommendations about how to improve the site’s recommendation capabilities going forward.
+
+    4. Create your report using an R Markdown file, and create a discussion thread with a link to the GitHub repo where your Markdown file notebook resides. You are not expected to need to write code for this discussion assignment.
+
+### Perform a Scenario Design analysis as described below.
+NYC 311 is a public government service that gives access to non-emergency city services and info about City government program. A user can register complains and get informations such as potholes, noises, and parking meter informations through their app or website.
+
+1. Who are your target users?
+  + residents living in 5 borough of New York city
+  
+2. What are their key goals?
+  + to allow user to participate in city maintainance, participate in local events, register complain about faulty food services, and non-emergency vandalism and obstruction
+  
+3. How can you help them improve their goals?
+ + NYC 311 application is great but it is limited to information and complain only. It can improve if user can allow notification reminder if there are any street cleaning, interactive calendar, and street closure.  
+
+### Reverse Engineering
+I think the app doesn't use data to give more service to the user. Allowing user to create a profile and make it more interactive by providing services like planner and notification services. We can then use the data, by user permission, tailor the user preference and provide such services. 
+
+### Suggestions for possible improvement
+
+Few simple services like asking permission to access GPS from the user to provide services like notifying street cleaning and street closure. A planner can be helpful to user and notify any heavy traffic or construction on the way. 
+
+
+
