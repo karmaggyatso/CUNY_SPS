@@ -1,0 +1,91 @@
+---
+title: "Week11_Assignment"
+author: "karmaGyatso"
+date: '2023-04-16'
+output: html_document
+---
+
+```{r}
+path = "https://raw.githubusercontent.com/karmaggyatso/CUNY_SPS/main/data_605/week_12/who.csv"
+csv_data = read.csv(path)
+
+head(csv_data)
+```
+
+```
+1. Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the
+variables. Provide and interpret the F statistics, R^2, standard error,and p-values only. Discuss
+whether the assumptions of simple linear regression met.
+```
+```{r}
+model = lm(LifeExp ~ TotExp, data = csv_data)
+plot(LifeExp ~ TotExp, data = csv_data, ylab = "Life Expectancy", xlab = "Total Expectancy") + 
+  abline(model)
+```
+
+```{r}
+summary(model)
+```
+
+F-statistic: 65.26 on 1 p-value: 7.714e-14 Multiple R-squared: 0.2577
+
+The F-statistic is testing the model against the null model, and the p-value is the chance that, given the hypothesis is true, the data turned out the way it did. There is a very low chance of that, according to our p-value of 7.714e-14. The R-squared value indicates that about 25.77% of the variation in the response variable can be attributed to the independent variable.
+
+```
+2. Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06
+power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r
+re-run the simple regression model using the transformed variables. Provide and interpret the F
+statistics, R^2, standard error, and p-values. Which model is "better?"
+```
+
+```{r}
+mod_2 <- lm(I(LifeExp^4.6) ~ I(TotExp^0.06), data = csv_data)
+summary(mod_2)
+```
+
+```{r}
+plot(I(LifeExp^4.6) ~ I(TotExp^0.06), data = csv_data, ylab = "Life Expectancy", xlab = "Total Expectancy")+
+abline(mod_2)
+```
+This adjustment increased our $R^2$ value to 72.83% and out F statistic to over 500, so it is already a better model than the first problem.
+
+```
+3. Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. Then forecast life
+expectancy when TotExp^.06=2.5.
+```
+```{r}
+ForLifeExpt <- function (x){
+  y <- mod_2$coefficients[1] + mod_2$coefficients[2] * x
+  y <- y^(1/4.6)
+  print(y)
+}
+ForLifeExpt(1.5)
+
+```
+```{r}
+ForLifeExpt(2.5)
+```
+
+```
+4. Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?
+
+  LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp
+```
+
+```{r}
+lm_fit <- lm(LifeExp ~ PropMD + TotExp + PropMD*TotExp, data = csv_data)
+summary(lm_fit)
+```
+
+Since the p-value is smaller than .05, the model is statistically significant. The R2 value indicates that the independent variable accounts for 35.74% of the variability in the independent variable. The F value indicates that the model is strong
+
+```
+5. Forecast LifeExp when PropMD=.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?
+```
+
+```{r}
+(le <- (lm_fit$coefficients[1]) +  (lm_fit$coefficients[2]*0.03) + (lm_fit$coefficients[3]*14) - (lm_fit$coefficients[4]*0.03*14))
+
+```
+
+This forecast is unrealistic, considering the age of the person is 107 years old.
